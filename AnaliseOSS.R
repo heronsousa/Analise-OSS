@@ -3,6 +3,7 @@
 library(readxl)
 library(dplyr)
 library(reshape2)
+library(ggplot2)
 
 
 options(scipen=999)
@@ -60,7 +61,37 @@ rm(municipio)
 registros$Estado <- factor(registros$Estado)
 
 #Reformatando as colunas dos anos com os valores usando a função 'melt' do pacote 'reshape2'
-dados = melt(registros, id=c('Gestao', 'Estado', 'Municipio', 'Nome_da_Unidade_de_Sa?de', 'CNPJ_da_OSS', 'Latitude', 'Longitude'), variable.name="Ano", value.name = "Valor")
+dados = melt(registros, id=c('Gestao', 'Estado', 'Municipio', 'Nome_da_Unidade_de_Saúde', 'CNPJ_da_OSS', 'Latitude', 'Longitude'), variable.name="Ano", value.name = "Valor")
+
+
+#Contagem de OSS em cada gestao
+count_gestao <- registros %>% count(Gestao)
+
+#Plotando quantidade de OSS por gestão
+ggplot(data=count_gestao, aes(x=Gestao, y=n)) +
+  geom_point(size=3) +
+  geom_segment(aes(x=Gestao, xend=Gestao, y=0, yend=n)) +
+  geom_text(aes(label=format(round(as.numeric(n), 2))), position=position_dodge(width=0.9), vjust=-0.7) +
+  labs(title="Quantidade de OSS por gestão", y=NULL) +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  theme_bw()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
