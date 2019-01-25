@@ -1,17 +1,15 @@
-#Analise das respostas dos Formul?rios OSS
+#Analise das respostas dos Formulários OSS
 
 library(readxl)
 library(dplyr)
-library(ggplot2)
 library(reshape2)
-library(tidyverse)
 
 
 options(scipen=999)
 options(digits = 10)
 
-#Define o diret?rio onde est?o os arquivos
-setwd("C:/Users/heronrs/Documents/Respostas OSS")
+#Define o diretório onde estão os arquivos
+setwd("~/Área de Trabalho/CGU/Respostas OSS")
 
 #Vetor com os nomes arquivos
 lista_arq = list.files()
@@ -21,10 +19,10 @@ registros = data.frame()
 
 for(i in lista_arq){
   
-  arquivo <- read_excel(i, col_names=c('Nome_da_Unidade_de_Sa?de', 'CNPJ_da_OSS', '2016', '2017', '2018', 'Latitude', 'Longitude'),
+  arquivo <- read_excel(i, col_names=c('Nome_da_Unidade_de_Saúde', 'CNPJ_da_OSS', '2016', '2017', '2018', 'Latitude', 'Longitude'),
                         col_types=c('guess', 'guess', 'numeric', 'numeric', 'numeric', 'guess', 'guess'), skip = 1)
   
-  #Define ? qual estado e municipio pertence cada registro, de acordo com o nome do arquivo
+  #Define à qual estado e municipio pertence cada registro, de acordo com o nome do arquivo
   #Nome do arquivo
   nome_arq <- sub("\\..*", "", i)
   gestao <- substr(nome_arq, 0, 1)
@@ -33,7 +31,7 @@ for(i in lista_arq){
   #Retira do nome do arquivo o municipio
   municipio <- substr(nome_arq, 5, nchar(nome_arq))
   
-  #Identificando ? qual gest?o pertence cada registro
+  #Identificando à qual gestão pertence cada registro
   if(gestao==1){
     arquivo$Gestao <- rep('Estadual', nrow(arquivo))
   }
@@ -41,9 +39,9 @@ for(i in lista_arq){
     arquivo$Gestao <- rep('Municipal', nrow(arquivo))
   }
   
-  #Cria uma nova coluna "Estado", replicando sua sigla pelo numero de registros que h? no arquivo
+  #Cria uma nova coluna "Estado", replicando sua sigla pelo numero de registros que há no arquivo
   arquivo$Estado <- rep(estado, nrow(arquivo))
-  #Cria uma nova coluna "Municipio", replicando seu nome pelo numero de registros que h? no arquivo
+  #Cria uma nova coluna "Municipio", replicando seu nome pelo numero de registros que há no arquivo
   arquivo$Municipio <- rep(municipio, nrow(arquivo))
   
   registros <- rbind.data.frame(registros,arquivo)
@@ -56,5 +54,19 @@ rm(gestao)
 rm(nome_arq)
 rm(estado)
 rm(municipio)
+
+
+#Transforma a coluna Estado em factor
+registros$Estado <- factor(registros$Estado)
+
+#Reformatando as colunas dos anos com os valores usando a função 'melt' do pacote 'reshape2'
+dados = melt(registros, id=c('Gestao', 'Estado', 'Municipio', 'Nome_da_Unidade_de_Sa?de', 'CNPJ_da_OSS', 'Latitude', 'Longitude'), variable.name="Ano", value.name = "Valor")
+
+
+
+
+
+
+
 
 
