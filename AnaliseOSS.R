@@ -78,9 +78,39 @@ ggplot(data=count_gestao, aes(x=Gestao, y=n)) +
         axis.ticks.y = element_blank()) +
   theme_bw()
 
+#rm(count_gestao)
+# rm(registros)
 
 
+#Separando os dados em estadual e municipal
+estadual <- registros[which(registros$Gestao == 'Estadual'),]
+municipal <- registros[which(registros$Gestao == 'Municipal'),]
 
+#Contagem de OSS em cada estado e municipio
+count_estado <- estadual %>% count(Estado)
+count_municipio <- municipal %>% count(Municipio)
+
+#Plotando quantidade de OSS em cada estado
+ggplot(data=count_estado, aes(x=Estado, y=n)) +
+  geom_point(size=3) +
+  geom_segment(aes(x=Estado, xend=Estado, y=0, yend=n)) +
+  geom_text(aes(label=format(round(as.numeric(n), 2))), position=position_dodge(width=0.9), vjust=-0.7) +
+  labs(title="Quantidade de OSS por estado (Gest?o Estadual)", y=NULL) +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  theme_bw()
+
+#Plotando quantidade de OSS por municipio
+ggplot(data=count_municipio, aes(x=Municipio, y=n)) +
+  geom_point(size=3) +
+  geom_segment(aes(x=Municipio, xend=Municipio, y=0, yend=n)) +
+  geom_text(aes(label=format(round(as.numeric(n), 2))), position=position_dodge(width=0.9), vjust=-0.7) +
+  labs(title="Quantidade de OSS por municipio (Gest?o municipal)", y=NULL) +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  theme_bw()
 
 
 
