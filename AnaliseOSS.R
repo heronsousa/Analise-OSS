@@ -78,9 +78,7 @@ ggplot(data=count_gestao, aes(x=Gestao, y=n)) +
         axis.ticks.y = element_blank()) +
   theme_bw()
 
-#rm(count_gestao)
-# rm(registros)
-
+rm(count_gestao)
 
 #Separando os dados em estadual e municipal
 estadual <- registros[which(registros$Gestao == 'Estadual'),]
@@ -89,6 +87,10 @@ municipal <- registros[which(registros$Gestao == 'Municipal'),]
 #Contagem de OSS em cada estado e municipio
 count_estado <- estadual %>% count(Estado)
 count_municipio <- municipal %>% count(Municipio)
+
+rm(estadual)
+rm(municipal)
+rm(registros)
 
 #Plotando quantidade de OSS em cada estado
 ggplot(data=count_estado, aes(x=Estado, y=n)) +
@@ -112,10 +114,9 @@ ggplot(data=count_municipio, aes(x=Municipio, y=n)) +
         axis.ticks.y = element_blank()) +
   theme_bw()
 
-
-
-
-
+rm(count_estado)
+rm(count_municipio)
+rm(dados)
 
 
 
