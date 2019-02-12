@@ -84,6 +84,10 @@ rm(count_gestao)
 estadual <- registros[which(registros$Gestao == 'Estadual'),]
 municipal <- registros[which(registros$Gestao == 'Municipal'),]
 
+#Separando os dados em estadual e municipal para representação dos montantes
+estadual_sum <- dados[which(dados$Gestao == 'Estadual'),]
+municipal_sum <- dados[which(dados$Gestao == 'Municipal'),]
+
 #Contagem de OSS em cada estado e municipio
 count_estado <- estadual %>% count(Estado)
 count_municipio <- municipal %>% count(Municipio)
@@ -97,7 +101,7 @@ ggplot(data=count_estado, aes(x=Estado, y=n)) +
   geom_point(size=3) +
   geom_segment(aes(x=Estado, xend=Estado, y=0, yend=n)) +
   geom_text(aes(label=format(round(as.numeric(n), 2))), position=position_dodge(width=0.9), vjust=-0.7) +
-  labs(title="Quantidade de OSS por estado (Gest?o Estadual)", y=NULL) +
+  labs(title="Quantidade de OSS por estado (Gestão Estadual)", y=NULL) +
   theme(plot.title = element_text(hjust = 0.5),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank()) +
@@ -108,7 +112,7 @@ ggplot(data=count_municipio, aes(x=Municipio, y=n)) +
   geom_point(size=3) +
   geom_segment(aes(x=Municipio, xend=Municipio, y=0, yend=n)) +
   geom_text(aes(label=format(round(as.numeric(n), 2))), position=position_dodge(width=0.9), vjust=-0.7) +
-  labs(title="Quantidade de OSS por municipio (Gest?o municipal)", y=NULL) +
+  labs(title="Quantidade de OSS por municipio (Gestão municipal)", y=NULL) +
   theme(plot.title = element_text(hjust = 0.5),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank()) +
@@ -116,7 +120,63 @@ ggplot(data=count_municipio, aes(x=Municipio, y=n)) +
 
 rm(count_estado)
 rm(count_municipio)
+
+
+#Summarize dos valores por ano e por estado na gestão estadual e municipal
+sum_ano <- group_by(dados, Ano) %>% summarize(Valor = sum(Valor, na.rm=TRUE))
+sum_estado <- group_by(dados, Estado) %>% summarize(Valor = sum(Valor, na.rm=TRUE))
+
+sum_ano_municipio <- group_by(municipal_sum, Ano) %>% summarize(Valor = sum(Valor, na.rm=TRUE))
+sum_ano_estado <- group_by(estadual_sum, Ano) %>% summarize(Valor = sum(Valor, na.rm=TRUE))
+
+rm(municipal_sum)
+rm(estadual_sum)
+
 rm(dados)
+
+#Plotando valor pelo ano
+ggplot(sum_ano, aes(x=Ano, y=Valor, fill=Ano)) +
+  geom_bar(stat = "identity", colour='black') +
+  geom_text(aes(label=format(round(as.numeric(Valor), 2), nsmall=1, big.mark=".")), position=position_dodge(width=0.9), vjust=-0.25) +
+  ggtitle('Montante dos valores das OSS por ano (Gestão estadual e municipal)') +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylab('Valor (em R$)') +
+  theme_bw()
+
+#Plotando valor por estado 
+ggplot(sum_estado, aes(x=Estado, y=Valor, fill=Estado)) +
+  geom_bar(stat = "identity", colour='black') +
+  scale_y_log10(breaks=c(10^6, 10^7, 10^8, 10^9, 10^10)) +
+  coord_cartesian(ylim = c(10^6, 10^7, 10^8, 10^9, 10^10)) +
+  geom_text(aes(label=format(round(as.numeric(Valor), 2), nsmall=1, big.mark=".")), position=position_dodge(width=0.4), vjust=-0.25) +
+  ggtitle('Montante dos valores das OSS por estado (Gestão estadual e municipal)') +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylab('Valor (em R$)') +
+  theme_bw()
+
+rm(sum_ano)
+rm(sum_estado)
+
+#Plotando valor pelo ano na gestão municipal
+ggplot(sum_ano_municipio, aes(x=Ano, y=Valor, fill=Ano)) +
+  geom_bar(stat = "identity", colour='black') +
+  geom_text(aes(label=format(round(as.numeric(Valor), 2), nsmall=1, big.mark=".")), position=position_dodge(width=0.9), vjust=-0.25) +
+  ggtitle('Montante dos valores das OSS por ano (Gestão municipal)') +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylab('Valor (em R$)') +
+  theme_bw()
+
+#Plotando valor pelo ano na gestão estadual
+ggplot(sum_ano_estado, aes(x=Ano, y=Valor, fill=Ano)) +
+  geom_bar(stat = "identity", colour='black') +
+  geom_text(aes(label=format(round(as.numeric(Valor), 2), nsmall=1, big.mark=".")), position=position_dodge(width=0.9), vjust=-0.25) +
+  ggtitle('Montante dos valores das OSS por ano (Gestão estadual)') +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylab('Valor (em R$)') +
+  theme_bw()
+
+rm(sum_ano_municipio)
+rm(sum_ano_estado)
 
 
 
